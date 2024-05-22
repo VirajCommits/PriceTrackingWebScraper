@@ -54,7 +54,7 @@ async def get_products(page, search_text, selector, get_product):
         page: represents the webpage
         selector: used to identify product elements on the page
         get_product: asynchronous function that extracts product details from a product element.
-        """
+    """
 
     print("Retreiving products.")
     product_divs = await page.query_selector_all(selector) # select all produncts on a given webpage
@@ -78,7 +78,64 @@ async def get_products(page, search_text, selector, get_product):
                     valid_products.append(product)
             tg.create_task(task(div)) # create a new task in the task group tg to process the 
                                       # current product element div asynchronously.
-
-
-
     return valid_products
+
+def save_results(results):
+    """ Function to save results in database to compare in future and search for price fluctuations """
+    data = {"results": results}
+    FILE = os.path.join("Scraper", "results.json")
+    with open(FILE, "w") as f:
+        json.dump(data, f)
+
+def post_results(results, endpoint, search_text, source):
+    """ function that posts results to the specified endpoint """
+    headers = {
+        "Content-Type": "application/json" # define headers for the HTTP request,content should be in json
+    }
+    # create dictionary data containing the search results (results), the search text (search_text), and the source (source)
+    data = {"data": results, "search_text": search_text, "source": source}
+
+    print("Sending request to", endpoint)
+    response = post("http://localhost:5000" + endpoint,
+                    headers=headers, json=data) # send a POST request to the endpoint with the headers and data
+    print("Status code:", response.status_code)
+
+
+async def main(url, search_text, response_route):
+    """ Input:
+    url: specified url we want to scrape(in our case AMAZON)
+    search_text: the product user wants to search for
+    response_route: the route to which the results will be posted
+    """
+    metadata = URLS.get(url) # get url of the website
+    if not metadata:
+        print("Invalid URL.")
+        return
+
+    async with async_playwright() as pw:
+        """ create an async context using Playwright, a tool for automating browsers """
+        print('Connecting to browser.')
+        browser = await pw.chromium.connect_over_cdp(browser_url) # this connects chromium browser to the specified browser_url
+        page = await browser.new_page() # creates a new browser tab (page) for the scraping process
+        print("Connected.")
+        await page.goto(url, timeout=120000) # navigates the page to the specified url with a timeout of 120 seconds
+        print("Loaded initial page.")
+        search_page = await search(metadata, page, search_text) # get the search page
+
+        def func(x): return None
+
+        if url == AMAZON:
+            func = get_amazon_product
+        else:
+            raise Exception('Invalid URL')
+
+        # call the get_products function to extract product information from the search results page
+        results = await get_products(search_page, search_text, metadata["product_selector"], func)
+        print("Saving results.")
+        # post results to the specific response_router
+        post_results(results, response_route, search_text, url)
+
+        await browser.close()
+    if __name__ == "__main__":
+        # test script
+        asyncio.run(main(AMAZON, "GTA 5 XBOX 360"))
