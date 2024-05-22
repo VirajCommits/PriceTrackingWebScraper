@@ -138,8 +138,8 @@ def start_scraper():
 
 @app.route('/add-tracked-product', methods=['POST'])
 def add_tracked_product():
-    """ To add a new tracked product to the TrackedProducts table and 
-        return a confirmation message along with the new product's ID. """
+    """ Function to add a new tracked product to the TrackedProducts table
+        and return a confirmation message along with the new product's ID."""
     name = request.json.get('name')
     tracked_product = TrackedProducts(name=name)
     db.session.add(tracked_product)
@@ -148,3 +148,62 @@ def add_tracked_product():
     response = {'message': 'Tracked product added successfully',
                 'id': tracked_product.id}
     return jsonify(response), 200
+
+@app.route('/tracked-product/<int:product_id>', methods=['PUT'])
+def toggle_tracked_product(product_id):
+    """ Function to toggle the tracking status (tracked field) of a 
+        product identified by product_id in the TrackedProducts table. """
+    tracked_product = TrackedProducts.query.get(product_id)
+    if tracked_product is None:
+        response = {'message': 'Tracked product not found'}
+        return jsonify(response), 404
+
+    tracked_product.tracked = not tracked_product.tracked
+    db.session.commit()
+
+    response = {'message': 'Tracked product toggled successfully'}
+    return jsonify(response), 200
+
+@app.route('/tracked-products', methods=['GET'])
+def get_tracked_products():
+    """ Function that gets all the tracked products """
+    tracked_products = TrackedProducts.query.all()
+
+    results = []
+    for product in tracked_products:
+        results.append({
+            'id': product.id,
+            'name': product.name,
+            'created_at': product.created_at,
+            'tracked': product.tracked
+        })
+
+    return jsonify(results), 200
+
+@app.route("/update-tracked-products", methods=["POST"])
+def update_tracked_products():
+    """ 
+        function that triggers the web scraper for each tracked product 
+        in the database and return a response indicating the scraping 
+        process has started.
+    """
+    tracked_products = TrackedProducts.query.all()
+    url = "https://amazon.ca"
+
+    product_names = []
+    for tracked_product in tracked_products:
+        name = tracked_product.name
+        if not tracked_product.tracked: # continue if a product is not a tracked product
+            continue
+
+        command = f"python ./scraper/__init__.py {url} \"{name}\" /results"
+        subprocess.Popen(command, shell=True)
+        product_names.append(name)
+
+    response = {'message': 'Scrapers started successfully',
+                "products": product_names}
+    return jsonify(response), 200
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all() # creates all database tables defined in the models
+    app.run()
