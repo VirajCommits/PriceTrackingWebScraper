@@ -1,4 +1,4 @@
-# Web Scraping Application
+<img width="828" alt="image" src="https://github.com/VirajCommits/PriceTrackingWebScraper/assets/121517813/52e53a55-231c-44be-a53f-326c940d862e"># Web Scraping Application
 
 This project is a web scraping application developed using Python, Flask, SQLAlchemy, and React. The application scrapes product data from specified websites, stores the data in a SQLite database, and provides a frontend interface to view the product information and price history.
 
@@ -49,3 +49,16 @@ npm install
 ```bash
 npm start
 ```
+## Example usage
+<img width="828" alt="image" src="https://github.com/VirajCommits/PriceTrackingWebScraper/assets/121517813/c95eda87-3f8c-4032-b818-79faa40b7eb4">
+<img width="856" alt="image" src="https://github.com/VirajCommits/PriceTrackingWebScraper/assets/121517813/273da121-37a3-4be7-b546-d04d41e6d8f4">
+
+
+## Contribution
+Contributions are welcome! Please fork this repository and submit pull requests to propose changes.
+
+## License
+
+This project is licensed under the MIT License.
+
+
