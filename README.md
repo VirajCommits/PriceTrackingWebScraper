@@ -12,7 +12,40 @@ This project is a web scraping application developed using Python, Flask, SQLAlc
 
 ## Installation
 
-1. **Clone the repository**:
+**Clone the repository**:
    ```bash
    git clone https://github.com/your-username/web-scraping-app.git
    cd web-scraping-app
+```
+## Backend Setup:
+### Navigate to the BackEnd directory:
+
+```bash
+cd BackEnd
+```
+## Create a virtual environment and activate it:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+```
+
+## Install the required Python packages:
+```bash
+pip install -r requirements.txt
+```
+## Run the Flask app:
+```bash
+python app.py
+```
+## Navigate to the FrontEnd directory:
+```bash
+cd ../FrontEnd
+```
+## Install the required npm packages:
+```bash
+npm install
+```
+## Start the React app:
+```bash
+npm start
+```
