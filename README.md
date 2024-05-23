@@ -1,4 +1,4 @@
-<img width="828" alt="image" src="https://github.com/VirajCommits/PriceTrackingWebScraper/assets/121517813/52e53a55-231c-44be-a53f-326c940d862e"># Web Scraping Application
+# Web Scraping Application
 
 This project is a web scraping application developed using Python, Flask, SQLAlchemy, and React. The application scrapes product data from specified websites, stores the data in a SQLite database, and provides a frontend interface to view the product information and price history.
 
